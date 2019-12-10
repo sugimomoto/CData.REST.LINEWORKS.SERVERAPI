@@ -1,0 +1,115 @@
+<api:script xmlns:api="http://apiscript.com/ns?v1" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+
+  <!-- See Column Definitions to specify column behavior and use XPaths to extract column values from JSON. -->
+  <api:info title="positions" desc="Generated schema file." xmlns:other="http://apiscript.com/ns?v1">
+    <!-- You can modify the name, type, and column size here. -->
+    <attr name="externalKey" xs:type="string"  readonly="false"       key="true"       other:xPath="/json/externalKey" />
+    <attr name="i18nNames"   xs:type="string"  readonly="false"              other:xPath="/json/i18nNames"   />
+    <attr name="name"        xs:type="string"  readonly="false"              other:xPath="/json/name"        />
+    <attr name="sortLevel"   xs:type="integer" readonly="false"              other:xPath="/json/sortLevel"   />
+  </api:info>
+
+  <api:set attr="DataModel" value="DOCUMENT" />
+  <api:set attr="APPID" value="[_connection.APPID]" />
+  <api:set attr="DomainId" value="[_connection.DomainId]" />
+
+  <api:set attr="ResourceName" value="positions" />
+
+  <api:set attr="ContentType" value="application/json"/>
+
+  <api:set attr="header:name" value="accept"/>
+  <api:set attr="header:value" value=" application/json"/>
+
+  <api:set attr="header:name#2" value="consumerKey"/>
+  <api:set attr="header:value#2" value="[_connection.ConsumerKey]"/>
+
+  <api:set attr="header:name#3" value="Authorization"/>
+  <api:set attr="header:value#3" value="Bearer [_connection.AccessToken]"/>
+
+  <api:set attr="encodepostdata" value="false" />
+
+  <api:set attr="URI" value="https://apis.worksmobile.com/r/[APPID]/organization/v2/domains/[DomainId]/[ResourceName]" />
+
+  <api:set attr="JSONPath" value="$." />
+
+  <!-- The GET method corresponds to SELECT. Here you can override the default processing of the SELECT statement. The results of processing are pushed to the schema's output. See SELECT Execution for more information. -->
+  <api:script method="GET">
+    <api:call op="jsonproviderGet">
+      <api:push/>
+    </api:call>
+  </api:script>
+
+  <!-- To add support for INSERTS please see the INSERT Execution page within the help for further information and examples. -->
+  <api:script method="POST">
+    <api:set attr="method" value="POST"/>
+    
+    <api:set attr="_input.requestData" value="def"/>
+
+    <!-- Insertで指定されたカラムを取得 -->
+    <api:enum list="[_query.selectcolumns]" separator=",">
+
+      <!-- 初期状態のカラムは[coulmnname]の状態のため、[]を削除 -->
+      <api:set attr="columnName" value="[_value | replace('\[','') | replace('\]','')]" />
+      
+      <api:if attr="_input.requestData" value="def" operator="equals">
+        <api:set attr="_input.requestData" value='"[columnName]":"[_input.[columnName]]"' />
+
+        <api:else>
+          <api:set attr="_input.requestData" value='[_input.requestData],"[columnName]":"[_input.[columnName]]"' />
+
+        </api:else>
+      </api:if>
+    </api:enum>
+
+    <api:set attr="data" value="{[_input.requestData]}"/>
+
+  <api:set attr="JSONPath" value="$." />
+    <api:call op="jsonproviderGet">
+      <api:push/>
+    </api:call>
+  </api:script>
+
+  <!-- To add support for UPDATES please see the UPDATE Execution page within the help for further information and examples. -->
+  <api:script method="MERGE">
+    <api:set attr="method" value="PATCH"/>
+
+    <api:set attr="URI" value="https://apis.worksmobile.com/r/[APPID]/organization/v2/domains/[DomainId]/[ResourceName]/[_input.externalKey]" />
+
+    <api:set attr="_input.requestData" value="def"/>
+
+    <!-- Insertで指定されたカラムを取得 -->
+    <api:enum list="[_query.selectcolumns]" separator=",">
+
+      <!-- 初期状態のカラムは[coulmnname]の状態のため、[]を削除 -->
+      <api:set attr="columnName" value="[_value | replace('\[','') | replace('\]','')]" />
+      
+      <api:if attr="_input.requestData" value="def" operator="equals">
+        <api:set attr="_input.requestData" value='"[columnName]":"[_input.[columnName]]"' />
+
+        <api:else>
+          <api:set attr="_input.requestData" value='[_input.requestData],"[columnName]":"[_input.[columnName]]"' />
+
+        </api:else>
+      </api:if>
+    </api:enum>
+
+    <api:set attr="data" value="{[_input.requestData]}"/>
+
+  <api:set attr="JSONPath" value="$." />
+    <api:call op="jsonproviderGet">
+      <api:push/>
+    </api:call>
+  </api:script>
+
+  <!-- To add support for DELETES please see the DELETE Execution page within the help for further information and examples. -->
+  <api:script method="DELETE">
+
+    <api:set attr="URI" value="https://apis.worksmobile.com/r/[APPID]/organization/v2/domains/[DomainId]/[ResourceName]/[_input.externalKey]" />
+
+    <api:set attr="method" value="DELETE"/>
+    <api:call op="jsonproviderGet">
+      <api:push/>
+    </api:call>
+  </api:script>
+
+</api:script>
